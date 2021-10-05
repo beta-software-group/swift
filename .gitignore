@@ -1,5 +1,7 @@
 # Ignore taskbook.db
 **/taskbook.db**
+# Ignore .idea directory
+**/.idea/**
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
