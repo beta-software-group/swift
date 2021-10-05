@@ -3,7 +3,7 @@
 
 <style>
   /* Force displaying cursor when hovering over task list input field classes */
-  .save_edit, .undo_edit, .move_task, .description, .edit_task, .delete_task {
+  .time_edit, .save_edit, .undo_edit, .move_task, .description, .edit_task, .delete_task {
     cursor: pointer;
   }
   /* Style applied to completed tasks */
@@ -64,14 +64,16 @@ function display_task(x) {
     t = '<tr id="task-'+x.id+'" class="task">' +
         '  <td style="width:36px"></td>' +  
         '  <td><span id="editor-'+x.id+'">' + 
-        '        <input id="input-'+x.id+'" style="height:22px" class="w3-input" '+ 
+        '        <input id="input-'+x.id+'" style="height:22px" class="w3-input"' +
         '          type="text" autofocus placeholder="Add an item..."/>'+
+        '        <input  hidden id="input-time-'+x.id+'" style="height:22px" type="time" value="12:00"/>' +
         '      </span>' + 
         '  </td>' +
-        '  <td style="width:72px">' +
-        '    <span id="filler-'+x.id+'" class="material-icons">more_horiz</span>' + 
-        // Hide the Save and Undo icons by default; Icons can be toggled by refrencing task id with jQuery .prop()
+        '  <td style="width:100px">' +
+        '    <span id="filler-'+x.id+'" class="material-icons">more_horiz</span>' +  // Draw the `...` symbol
+        // Hide the Save and Undo icons by default; Icons can be toggled by using task id with jQuery .prop()
         // + See also: input_keypress()
+        '    <span id="time_edit-'+x.id+'" hidden class="time_edit material-icons">schedule</span>' +
         '    <span id="save_edit-'+x.id+'" hidden class="save_edit material-icons">done</span>' +
         '    <span id="undo_edit-'+x.id+'" hidden class="undo_edit material-icons">cancel</span>' +
         '  </td>' +
@@ -83,6 +85,7 @@ function display_task(x) {
         '  <td><span id="description-'+x.id+'" class="description' + completed + '">' + x.description + '</span>' + 
         '      <span id="editor-'+x.id+'" hidden>' + 
         '        <input id="input-'+x.id+'" style="height:22px" class="w3-input" type="text" autofocus/>' +
+        '        <input id="input-time-'+x.id+'" style="height:22px" type="time" value="12:00"/>' +
         '      </span>' + 
         '  </td>' +
         '  <td>' +
@@ -91,6 +94,7 @@ function display_task(x) {
         '    <span id="delete_task-'+x.id+'" class="delete_task material-icons">delete</span>' +
         // Hide the Save and Undo icons by default; Icons can be toggled by refrencing task id with jQuery .prop()
         // + See also: edit_task()
+        '    <span id="time_edit-'+x.id+'" hidden class="time_edit material-icons">schedule</span>' +
         '    <span id="save_edit-'+x.id+'" hidden class="save_edit material-icons">done</span>' + 
         '    <span id="undo_edit-'+x.id+'" hidden class="undo_edit material-icons">cancel</span>' +
         '  </td>' +
@@ -126,6 +130,7 @@ function get_current_tasks() {
     $(".move_task").click(move_task);
     $(".description").click(complete_task)
     $(".edit_task").click(edit_task);
+    $(".time_edit").click(time_edit);
     $(".save_edit").click(save_edit);
     $(".undo_edit").click(undo_edit);
     $(".delete_task").click(delete_task);
@@ -157,7 +162,11 @@ function input_keypress(event) {
 
   // Set properties of elements using HTML the id attribute as selector
   // + https://api.jquery.com/prop/
+  // Hide `...` symbol and time input field
   $("#filler-"+id).prop('hidden', true);
+  $("#input-time-"+id).prop('hidden', true);
+  // Show time, save, undo buttons
+  $("#time_edit-"+id).prop('hidden', false);
   $("#save_edit-"+id).prop('hidden', false);
   $("#undo_edit-"+id).prop('hidden', false);
 }
@@ -223,12 +232,15 @@ function edit_task(event) {
   // Set the contents of the input field to match task description
   $("#input-"+id).val($("#description-"+id).text());
   // Hide task description, move, edit, and delete buttons
-  $("#move_task-"+id).prop('hidden', true);
   $("#description-"+id).prop('hidden', true);
+  $("#move_task-"+id).prop('hidden', true);
   $("#edit_task-"+id).prop('hidden', true);
   $("#delete_task-"+id).prop('hidden', true);
-  // Show text field, save and undo buttons
+  // Show text input field; Hide time input by default
   $("#editor-"+id).prop('hidden', false);
+  $("#input-time-"+id).prop('hidden', true);
+  // Show time, save, delete buttons
+  $("#time_edit-"+id).prop('hidden', false);
   $("#save_edit-"+id).prop('hidden', false);
   $("#undo_edit-"+id).prop('hidden', false);
 
@@ -274,6 +286,7 @@ function undo_edit(event) {
   if ((id != "today") & (id != "tomorrow")) {
     // Hide text field, save and undo buttons
     $("#editor-"+id).prop('hidden', true);
+    $("#time_edit-"+id).prop('hidden', true);
     $("#save_edit-"+id).prop('hidden', true);
     $("#undo_edit-"+id).prop('hidden', true);
     // Show task description, move, edit, and delete buttons
@@ -285,6 +298,14 @@ function undo_edit(event) {
   }
   // set the editing flag
   $("#current_input").val("")
+}
+
+function time_edit(event) { 
+  id = event.target.id.replace("time_edit-","") // Get the id of the task as a plain integer
+  console.log("edit time", id)
+  time_input = "#input-time-" + id
+
+  $(time_input).prop('hidden', !$(time_input).prop('hidden'))
 }
 
 
