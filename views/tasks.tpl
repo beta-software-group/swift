@@ -2,7 +2,7 @@
 % include("banner.tpl")
 
 <style>
-  .save_edit, .undo_edit, .move_task, .description, .edit_task, .delete_task {
+  .save_edit, .undo_edit, .move_task, .description, .edit_task, .delete_task, .highlight {
     cursor: pointer;
   }
   .completed {text-decoration: line-through;}
@@ -121,6 +121,14 @@ function edit_task(event) {
   $("#current_input").val(event.target.id)
 }
 
+
+function highlight(event){
+  console.log("highlight", event.target.id)
+  id = event.target.id.replace("highlight-","");
+  //insert("style="background-color:tomato") into <span>
+}
+
+
 function save_edit(event) {
   console.log("save item", event.target.id)
   id = event.target.id.replace("save_edit-","");
@@ -201,6 +209,7 @@ function display_task(x) {
         '  <td>' +
         '    <span id="edit_task-'+x.id+'" class="edit_task '+x.list+' material-icons">edit</span>' +
         '    <span id="delete_task-'+x.id+'" class="delete_task material-icons">delete</span>' +
+        '    <span id="highlight-'+x.id+'" class="highlight material-icons">highlight</span>' +
         '    <span id="save_edit-'+x.id+'" hidden class="save_edit material-icons">done</span>' + 
         '    <span id="undo_edit-'+x.id+'" hidden class="undo_edit material-icons">cancel</span>' +
         '  </td>' +
@@ -225,6 +234,7 @@ function get_current_tasks() {
     $(".move_task").click(move_task);
     $(".description").click(complete_task)
     $(".edit_task").click(edit_task);
+    $(".highlight").click(highlight);
     $(".save_edit").click(save_edit);
     $(".undo_edit").click(undo_edit);
     $(".delete_task").click(delete_task);
