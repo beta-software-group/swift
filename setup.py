@@ -6,8 +6,12 @@ if __name__ == "__main__":
     task_table.drop()                              # Delete the 'task' table..? o.O
     task_table = taskbook_db.create_table('task')  # Create the 'task' table
     task_table.insert_many([                       # Insert multiple rows (tasks) at one time
-        {"time": 0.0, "description": "Do something useful", "list": "today", "completed": True},
-        {"time": 0.5, "description": "Do something fantastic", "list": "today", "completed": False},
-        {"time": 0.3, "description": "Do something remarkable", "list": "tomorrow", "completed": False},
-        {"time": 0.7, "description": "Do something unusual", "list": "tomorrow", "completed": True}
+        {"time": 0.0, "description": "Do something useful",
+         "list": "today", "completed": True, "scheduled": True, "due": "12:15 PM"},
+        {"time": 0.5, "description": "Do something fantastic",
+         "list": "today", "completed": False, "scheduled": True, "due": "05:45 AM"},
+        {"time": 0.3, "description": "Do something remarkable",
+         "list": "tomorrow", "completed": False, "scheduled": True, "due": "02:00 PM"},
+        {"time": 0.7, "description": "Do something unusual",
+         "list": "tomorrow", "completed": True, "scheduled": False}
     ])

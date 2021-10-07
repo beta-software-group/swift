@@ -2,6 +2,11 @@
 % include("banner.tpl")
 
 <style>
+  /* Style applied to task due time */
+  .task_due {
+    font-size: 75%;
+    color: #6C757D;
+  }
   /* Force displaying cursor when hovering over task list input field classes */
   .time_edit, .save_edit, .undo_edit, .move_task, .description, .edit_task, .delete_task {
     cursor: pointer;
@@ -60,15 +65,17 @@ function display_task(x) {
   // + If it does, this task represents the input field for adding new tasks
   if ((x.id == "today") | (x.id == "tomorrow")) { // Display the input fields for adding new tasks
     // Tasks that hold input fields for creating new tasks are assigned HTML id=task-<LIST_NAME>
-    // + The acual input field holds HTML id=input<TASK_ID>
+    // + The acual input field holds HTML id=input-<TASK_ID>
     t = '<tr id="task-'+x.id+'" class="task">' +
         '  <td style="width:36px"></td>' +  
         '  <td><span id="editor-'+x.id+'">' + 
-        '        <input id="input-'+x.id+'" style="height:22px" class="w3-input"' +
+        '        <input id="input-'+x.id+'" style="height:22px" class="w3-input" ' +
         '          type="text" autofocus placeholder="Add an item..."/>'+
-        '        <input  hidden id="input-time-'+x.id+'" style="height:22px" type="time" value="12:00"/>' +
+        '        <input hidden id="input-time-'+x.id+'" style="height:22px" type="time" value="12:00"/>' +
         '      </span>' + 
         '  </td>' +
+
+        // HTML for task creator buttons
         '  <td style="width:100px">' +
         '    <span id="filler-'+x.id+'" class="material-icons">more_horiz</span>' +  // Draw the `...` symbol
         // Hide the Save and Undo icons by default; Icons can be toggled by using task id with jQuery .prop()
@@ -78,16 +85,19 @@ function display_task(x) {
         '    <span id="undo_edit-'+x.id+'" hidden class="undo_edit material-icons">cancel</span>' +
         '  </td>' +
         '</tr>';
-  } else { // Display the task in view mode (it has an id=task-<INT>)
-    // Tasks are assigned HTML id=task-<INT>
+  } else { // Display an existing task
     t = '<tr id="task-'+x.id+'" class="task">' + 
         '  <td><span id="move_task-'+x.id+'" class="move_task '+x.list+' material-icons">' + arrow + '</span></td>' +
         '  <td><span id="description-'+x.id+'" class="description' + completed + '">' + x.description + '</span>' + 
+        // If the task is scheduled, remove the hidden attribute; If the due time is null set text content to empty string
+        '      <span' + (x.scheduled ? " " : " hidden ") + 'id="task-due-'+x.id+'" class="task_due' + completed + '">' + (x.due != null ? x.due : "") + '</span>' +
         '      <span id="editor-'+x.id+'" hidden>' + 
         '        <input id="input-'+x.id+'" style="height:22px" class="w3-input" type="text" autofocus/>' +
         '        <input id="input-time-'+x.id+'" style="height:22px" type="time" value="12:00"/>' +
         '      </span>' + 
         '  </td>' +
+
+        // HTML for task buttons
         '  <td>' +
         // Show the Edit and Delete icons by default
         '    <span id="edit_task-'+x.id+'" class="edit_task '+x.list+' material-icons">edit</span>' +
@@ -116,28 +126,33 @@ function get_current_tasks() {
   $(".task").remove();
   // Create two tasks with id=today and id=tomorrow
   // + These IDs will display new task input fields within display_task()
-  display_task({id:"today", list:"today"})
-  display_task({id:"tomorrow", list:"tomorrow"})
+  display_task({id: "today", list: "today"})
+  display_task({id: "tomorrow", list: "tomorrow"})
 
   // display the tasks
-  api_get_tasks(function(result){
-    for (const task of result.tasks) {
-      display_task(task);
-    }
-    
-    // Set click events for elements with HTML classes 
-    // + Each of these *_task() functions call an api_*_task() function to interface with swift.py
-    $(".move_task").click(move_task);
-    $(".description").click(complete_task)
-    $(".edit_task").click(edit_task);
-    $(".time_edit").click(time_edit);
-    $(".save_edit").click(save_edit);
-    $(".undo_edit").click(undo_edit);
-    $(".delete_task").click(delete_task);
+  api_get_tasks(
+    function(result){
+      for (const task of result.tasks) {
+        display_task(task);
+        if (task.scheduled) { // Check if we should display task due time
+          $("#task-due-"+task.id).prop("hidden", false)
+        }
+      }
+      
+      // Set click events for elements with HTML classes 
+      // + Each of these *_task() functions call an api_*_task() function to interface with swift.py
+      $(".move_task").click(move_task);
+      $(".description").click(complete_task)
+      $(".edit_task").click(edit_task);
+      $(".time_edit").click(time_edit);
+      $(".save_edit").click(save_edit);
+      $(".undo_edit").click(undo_edit);
+      $(".delete_task").click(delete_task);
 
-    // Set all input HTML elements to call input_keypress when key is pressed
-    $("input").keypress(input_keypress);
-  });
+      // Set all input HTML elements to call input_keypress when key is pressed
+      $("input").keypress(input_keypress);
+    }
+  );
 }
 
 
@@ -172,6 +187,17 @@ function input_keypress(event) {
 }
 
 
+/* HELPER FUNCTIONS */
+
+function convert_time(text) {
+  result = text != "" ? text.substring(0, 5) : "12:00"
+  if (text.substring(6, 8) == "PM" && parseInt(result) != 12) {
+    result = (parseInt(result) + 12) + ":" + result.substring(3, 5)
+  }
+  return result;
+}
+
+
 /* EVENT HANDLERS */
 
 function move_task(event) {
@@ -184,11 +210,18 @@ function move_task(event) {
   // + If the target has the HTML class "today", we must want to move it to "tomorrow"
   target_list = event.target.className.search("today") > 0 ? "tomorrow" : "today";
   // Move the task; If we succeed call get_current_tasks() to update the list
-  api_update_task({'id':id, 'list':target_list},
-                  function(result) { 
-                    console.log(result);
-                    get_current_tasks();
-                  } );
+  api_update_task(
+    { /* Task move data */
+      'id': id,
+      'list': target_list,
+      'scheduled': !$("#task-due-"+id).prop("hidden"),
+      'due': convert_time($("#task-due-"+id).text())
+    },
+    function(result) {
+      console.log(result);
+      get_current_tasks();
+    }
+  );
 }
 
 function complete_task(event) {
@@ -201,11 +234,18 @@ function complete_task(event) {
   completed = event.target.className.search("completed") > 0;
   console.log("updating :",{'id':id, 'completed':completed==false})
   // Mark the task completed; If we succeed call get_current_tasks() to update the list
-  api_update_task({'id':id, 'completed':completed==false}, 
-                  function(result) { 
-                    console.log(result);
-                    get_current_tasks();
-                  } );
+  api_update_task(
+    { /* Task complete data */
+      'id': id,
+      'completed': completed==false,
+      'scheduled': !$("#task-due-"+id).prop("hidden"),
+      'due': convert_time($("#task-due-"+id).text())
+    },
+    function(result) {
+      console.log(result);
+      get_current_tasks();
+    }
+  );
 }
 
 function delete_task(event) {
@@ -215,11 +255,15 @@ function delete_task(event) {
   id = event.target.id.replace("delete_task-",""); // Get the id of the task as a plain integer
 
   // Delete the task; If we succeed call get_current_tasks() to update the list
-  api_delete_task({'id':id},
-                  function(result) { 
-                    console.log(result);
-                    get_current_tasks();
-                  } );
+  api_delete_task(
+    {
+      'id':id
+    },
+    function(result) {
+      console.log(result);
+      get_current_tasks();
+    }
+  );
 }
 
 // Called when edit button is clicked
@@ -236,9 +280,12 @@ function edit_task(event) {
   $("#move_task-"+id).prop('hidden', true);
   $("#edit_task-"+id).prop('hidden', true);
   $("#delete_task-"+id).prop('hidden', true);
-  // Show text input field; Hide time input by default
-  $("#editor-"+id).prop('hidden', false);
-  $("#input-time-"+id).prop('hidden', true);
+  $("#editor-"+id).prop('hidden', false); // Show text input field
+  // Use helper function to find default value for time input field using task-due element
+  $("#input-time-"+id).val(convert_time($("#task-due-"+id).text()));
+  // Show the time edit field by default on tasks that are scheduled
+  $("#input-time-"+id).prop('hidden', $("#task-due-"+id).prop("hidden"));
+
   // Show time, save, delete buttons
   $("#time_edit-"+id).prop('hidden', false);
   $("#save_edit-"+id).prop('hidden', false);
@@ -255,23 +302,43 @@ function save_edit(event) {
   console.log("save item", event.target.id)
   id = event.target.id.replace("save_edit-",""); // Get the id of the task as a plain integer
   console.log("desc to save = ",$("#input-" + id).val())
+  console.log("due time to save = ", $("#input-time-" + id).val())
+
+  // If the time input is not hidden, the task is scheduled; Show due time
+  is_scheduled = !$("#input-time-"+id).prop("hidden")
+  $("#task-due-"+id).prop("hidden", is_scheduled)
 
   // If the task we are saving already exists
   if ((id != "today") & (id != "tomorrow")) {
-    api_update_task({'id':id, description:$("#input-" + id).val()},
-                    function(result) { 
-                      console.log(result);
-                      get_current_tasks();
-                      $("#current_input").val("")
-                    } );
+    api_update_task(
+      { /* Updated task data */
+        'id': id,
+         description: $("#input-" + id).val(),
+         scheduled: is_scheduled,
+         due: is_scheduled ? $("#input-time-"+id).val() : ""
+      },
+      function(result) { 
+        console.log(result);
+        get_current_tasks();
+        $("#current_input").val("")
+      }
+    );
   } else { // If the task we are saving is a new task
-    api_create_task({description:$("#input-" + id).val(), list:id},
-                    function(result) { 
-                      console.log(result);
-                      get_current_tasks();
-                      $("#current_input").val("")
-                    } );
+    api_create_task(
+      { /* New task data */
+        description: $("#input-" + id).val(),
+        list: id,
+        scheduled: is_scheduled,
+        due: is_scheduled ? $("#input-time-"+id).val() : ""
+      },
+      function(result) { 
+        console.log(result);
+        get_current_tasks();
+        $("#current_input").val("")
+      }
+    );
   }
+
 }
 
 // Called when you edit an item and then click the X instead of saving the changes

@@ -79,7 +79,7 @@ def create_task():
     try:  # Validate that the request data is valid for our application
         data = request.json
         for key in data.keys():
-            assert key in ["description", "list"], f"Illegal key '{key}'"
+            assert key in ["scheduled", "due", "description", "list"], f"Illegal key '{key}'"
         assert type(data['description']) is str, "Description is not a string."
         assert len(data['description'].strip()) > 0, "Description is length zero."
         assert data['list'] in ["today", "tomorrow"], "List must be 'today' or 'tomorrow'"
@@ -94,7 +94,10 @@ def create_task():
             "time": time.time(),
             "description": data['description'].strip(),
             "list": data['list'],
-            "completed": False
+            "completed": False,
+            "scheduled": data['scheduled'],
+            # Parse the task due time from 24H format to 12H format, if it exists
+            "due": "" if data['due'] == "" else time.strftime("%I:%M %p", time.strptime(data['due'], "%H:%M"))
         })
     except Exception as e:
         response.status = "409 Bad Request:" + str(e)  # 409 conflict
@@ -117,7 +120,7 @@ def update_task():
         # We now have a dictionary formatted using key, value pairs parsed from json
         # https://docs.python.org/3/library/stdtypes.html#dict.keys
         for key in data.keys():  # This loop checks that all the keys within json are valid for our db
-            assert key in ["id", "description", "completed", "list"], f"Illegal key '{key}'"
+            assert key in ["scheduled", "due", "id", "description", "completed", "list"], f"Illegal key '{key}'"
         assert type(data['id']) is int, f"id '{id}' is not int"
         # We now know all the keys we need exist, so we can use them without worrying about missing data
 
@@ -139,6 +142,10 @@ def update_task():
     # + If it didn't exist, wouldn't the `assert` above have failed? (Can't we remove this?)
     if 'list' in data:
         data['time'] = time.time()
+
+    # If the task has a due time, parse it from 24H format used in HTML input field to 12H used for display
+    if data['due'] != "":
+        data['due'] = time.strftime("%I:%M %p", time.strptime(data['due'], "%H:%M"))
 
     try:  # Attempt to update the `task` table with the new row using request data that is now in `data`
         task_table = taskbook_db.get_table('task')  # Get the tasks table from the database
