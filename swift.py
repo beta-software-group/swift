@@ -64,12 +64,28 @@ def create_task():
         return
     try:
         task_table = taskbook_db.get_table('task')
-        task_table.insert({
-            "time": time.time(),
-            "description":data['description'].strip(),
-            "list":data['list'],
-            "completed":False
-        })
+        if "RECUR" in data['description']:
+            data['description'] = data['description'].strip('RECUR')
+
+            task_table.insert({
+                "time": time.time(),
+                "description":data['description'].strip(),
+                "list":"today",
+                "completed":False
+            })
+            task_table.insert({
+                "time": time.time(),
+                "description":data['description'].strip(),
+                "list":"tomorrow",
+                "completed":False
+            })
+        else:
+            task_table.insert({
+                "time": time.time(),
+                "description":data['description'].strip(),
+                "list":data['list'],
+                "completed":False
+            })
     except Exception as e:
         response.status="409 Bad Request:"+str(e)
     # return 200 Success
