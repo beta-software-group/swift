@@ -18,6 +18,8 @@
     width: 60%;
   }
 
+ 
+
   /* Force displaying cursor when hovering over task list input field classes */
   .time_edit, .save_edit, .undo_edit, .move_task, .description, .edit_task, .delete_task {
     cursor: pointer;
@@ -27,24 +29,33 @@
   .completed {text-decoration: line-through;}
   .description { padding-left:8px }
 </style>
+<div class="container">
 
-<div class="w3-row">
-  <div class="w3-col s6 w3-container w3-topbar w3-bottombar w3-leftbar w3-rightbar w3-border-white">
+<div class="row">
+  <div class="col-sm-12 col-md-6">
+
     <div class="w3-row w3-xxlarge w3-bottombar w3-border-black w3-margin-bottom">
       <h1><i>Today</i></h1>
     </div>
     <table id="task-list-today" class="w3-table">
     </table>
     <div class="w3-row w3-bottombar w3-border-black w3-margin-bottom w3-margin-top"></div>
-  </div>
+ 
+</div>
 
-  <div class="w3-col s6 w3-container w3-topbar w3-bottombar w3-leftbar w3-rightbar w3-border-white">
+
+
+<div class="col-sm-12 col-md-6">
+ 
     <div class="w3-row w3-xxlarge w3-bottombar w3-border-black w3-margin-bottom">
       <h1><i>Tomorrow</i></h1>
     </div>
     <table  id="task-list-tomorrow" class="w3-table">
     </table>
     <div class="w3-row w3-bottombar w3-border-black w3-margin-bottom w3-margin-top"></div>
+
+</div>
+
   </div>
 </div>
 
