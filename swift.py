@@ -75,6 +75,7 @@ def create_task():
     try:  # Attempt to create the task using the validated request data
         task_table = taskbook_db.get_table('task')
 
+
         if "RECUR:" in data['description']:
             data['description'] = data['description'].strip('RECUR:')
             task_table.insert({
@@ -102,6 +103,7 @@ def create_task():
                 # Parse the task due time from 24H format to 12H format, if it exists
                 "due": "" if data['due'] == "" else time.strftime("%I:%M %p", time.strptime(data['due'], "%H:%M"))
             })
+
     except Exception as e:
         response.status = "409 Bad Request:" + str(e)  # 409 conflict
 

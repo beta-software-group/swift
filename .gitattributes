@@ -1,0 +1,5 @@
+# Enforce LF line endings when updating remote
+* text=auto eol=lf
+# Exclude binary files from EOL detection
+*.{png,jpg,jpeg,gif,webp,woff,woff2} binary
+
