@@ -51,21 +51,36 @@ def step_impl(context, task_list):
     context.task_list = task_list
     context.button_save = context.browser.find_element(By.ID, f'save_edit-{context.task_list}')
     context.input_description = context.browser.find_element(By.ID, f'input-{context.task_list}')
-    context.input_description.clear()
+    time.sleep(0.25)
 
 
 @when('task is set to "{description}" due at {due_time}')
 def step_impl(context, description, due_time):
+    context.input_description.clear()
     context.input_description.send_keys(description)
-    context.description = description
-    if eval(due_time):  # Only input time if specified in examples for scenario outline; Allows for empty example fields
-        context.browser.find_element(By.XPATH, f'//*[@id="time_edit-{context.task_list}"]').click()
-        context.browser.find_element(By.ID, f'input-time-{context.task_list}').send_keys(due_time)
+    context.description_new = description
+    # Only input time if specified in examples for scenario outline; Allows for empty example fields
+    if eval(due_time):
+        # If the target_task WebElement exists, use it; Else target new task input fields in task_list
+        if 'target_task' in context:
+            context.target_task.find_element(By.CLASS_NAME, 'time_edit').click()
+            context.target_task.find_element(By.CLASS_NAME, 'time_input').send_keys(due_time)
+        else:
+            context.browser.find_element(By.XPATH, f'//*[@id="time_edit-{context.task_list}"]').click()
+            context.browser.find_element(By.ID, f'input-time-{context.task_list}').send_keys(due_time)
 
 
 @when('the task is saved')
 def step_impl(context):
     context.browser.find_element(By.ID, f'save_edit-{context.task_list}').click()
+    # Wait for page refresh; Initialize WebElement that is (or should be) the task we just saved
+    time.sleep(0.25)
+    context.target_list = context.browser.find_element(By.XPATH, f'//*[@id="task-list-{context.task_list}"]')
+    context.target_task = context.browser.find_elements(By.XPATH, f'//*[@id="task-list-{context.task_list}"]/tr')[-1]
+    # Store the id attribute attached to the <tr> HTML element that holds target_task
+    context.task_id = context.target_task.get_dom_attribute('id')
+    # Only update description when task is saved
+    context.description = context.description_new
 
 
 @then('the task "{description}" is on the page')
@@ -77,18 +92,19 @@ def step_impl(context, description):
 
 @then('the task description is in list "{task_list}"')
 def step_impl(context, task_list):
-    # Target the task list specified in the examples for the scenario outline
-    target_list = context.browser.find_elements(By.XPATH, f'//*[@id="task-list-{task_list}"]/tr')
     # Assert that the task description text exists somewhere in the table
-    assert context.description in target_list[-1].text
-    context.target_list = target_list
+    assert context.description in context.target_list.text
 
 
 @then('the task due time displayed is {due_time}')
 def step_impl(context, due_time):
     # Target the task due time HTML element used to display existing due time
-    task_due = context.target_list[-1].find_element(By.CLASS_NAME, "task_due")
+    task_due = context.target_task.find_element(By.CLASS_NAME, "task_due")
     if eval(due_time):  # If time is set, check it is not hidden
         assert task_due.is_displayed()
     else:  # If time is unset, check that task due time is hidden
         assert not task_due.is_displayed()
+
+    # Strip ':' from task_due; Check the time value matches due_time
+    time_text = str(task_due.text).replace(":", "")
+    assert eval(due_time) in time_text
