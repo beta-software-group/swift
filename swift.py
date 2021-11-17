@@ -6,6 +6,7 @@ from bottle import run, default_app  # Development server
 from bottle import request, response  # Web transaction objects
 from bottle import route, get, put, post, delete  # HTML request types
 from bottle import template  # Web page template processor
+from bottle import static_file # allows binding static files to routes
 
 # Imports for API
 import json  # https://docs.python.org/3/library/json.html
@@ -16,8 +17,12 @@ import time
 # ---------------------------
 # web application routes
 # ---------------------------
-
+# The base route contains the task scheduler
 @route('/')
+def scheduler():
+    return template("scheduler.tpl")
+
+# The task route contains our previous static scheduler
 @route('/tasks')
 def tasks():
     return template("tasks.tpl")
@@ -31,6 +36,8 @@ def login():
 @route('/register')
 def login():
     return template("register.tpl")
+
+
 
 
 # ---------------------------
