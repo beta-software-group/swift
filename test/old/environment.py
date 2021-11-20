@@ -49,10 +49,12 @@ def visit_swift(context, timeout=30):
     """ Use a fixture to perform a common task between several tests """
     context.browser.get("http://localhost:8080")
 
+
 @fixture
 def visit_old_swift(context, timeout=30):
     """ Use a fixture to perform a common task between several tests """
     context.browser.get("http://localhost:8080/tasks")
+
 
 # All fixture names stored in a dictionary
 # Used for calling fixtures from .feature files by their string key

@@ -7,12 +7,15 @@ import time
 
 
 def after_step(context, step):
+    # After each step, update context.soup with new page_source
+    context.soup = BeautifulSoup(context.browser.page_source, 'html.parser')
     time.sleep(2)
 
 
 def after_scenario(context, step):
     """ Automatically deletes all tasks that contain [TEST] in the description """
     s = BeautifulSoup(context.browser.page_source, 'html.parser')
+    # TODO: Refreshing the page removes all task edits, so this isn't needed for now
     for table in s.find_all('table'):
         for row in table.find_all('tr'):
             if not row.find(text=re.compile('\[TEST]')):
@@ -49,10 +52,12 @@ def visit_swift(context, timeout=30):
     """ Use a fixture to perform a common task between several tests """
     context.browser.get("http://localhost:8080")
 
+
 @fixture
 def visit_old_swift(context, timeout=30):
     """ Use a fixture to perform a common task between several tests """
     context.browser.get("http://localhost:8080/tasks")
+
 
 # All fixture names stored in a dictionary
 # Used for calling fixtures from .feature files by their string key
