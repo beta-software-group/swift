@@ -1,5 +1,5 @@
 @fixture.browser.chrome
-@fixture.get.swift.local
+@fixture.get.swift.old
 Feature: Ability to edit existing tasks
 
     Scenario Outline: Task edits are updated correctly

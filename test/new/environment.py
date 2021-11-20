@@ -49,6 +49,10 @@ def visit_swift(context, timeout=30):
     """ Use a fixture to perform a common task between several tests """
     context.browser.get("http://localhost:8080")
 
+@fixture
+def visit_old_swift(context, timeout=30):
+    """ Use a fixture to perform a common task between several tests """
+    context.browser.get("http://localhost:8080/tasks")
 
 # All fixture names stored in a dictionary
 # Used for calling fixtures from .feature files by their string key
@@ -57,4 +61,5 @@ fixture_registry = {
     # "fixture.browser.firefox": browser_firefox,
     "fixture.browser.chrome":  browser_chrome,
     "fixture.get.swift.local": visit_swift,
+    "fixture.get.swift.old": visit_old_swift,
 }

@@ -1,5 +1,5 @@
 @fixture.browser.chrome
-@fixture.get.swift.local
+@fixture.get.swift.old
 Feature: Ability to create recurring tasks
 
     Scenario Outline: Recurring tasks are shown in both lists

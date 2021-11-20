@@ -1,7 +1,6 @@
 @fixture.browser.chrome
-@fixture.get.swift.local
+@fixture.get.swift.old
 Feature: Ability to create and modify tasks
-# TODO: Write tests for editing tasks
 
     Scenario Outline: Creation of tasks
         Given we are creating a new task in "<list>"
