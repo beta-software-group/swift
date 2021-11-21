@@ -17,5 +17,11 @@
 
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+<!-- Google Fonts - Lato -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
+
 </head>
 <body class="darkModeBody>

@@ -18,10 +18,7 @@
     width: 60%;
   }
 
-  .btnDarkMode {
-    margin-top: 50px;
-  }
-
+  
 
 
 .darkModeBody {
@@ -61,16 +58,33 @@
       width: 700px;
       height: 750px;
       margin: 70px auto;
-      border: 2px solid rgb(0, 0, 0)
+      padding-top: 15px;
+      border-radius: 15px;
+      
+      
+    
     }
+
+    .black-border {
+      border: 2px solid rgb(0, 0, 0);
+    }
+
+    .white-border {
+      border: 2px solid rgb(255, 255, 255);
+    }
+
+ 
+
     h2 {
       text-align: center;
+      
     }
 
     #projects {
       width: 600px;
       height:600px;
       margin: 0px auto;
+     
       
     }
 
@@ -78,20 +92,29 @@
     ol li{
       background-color: rgba(211, 210, 210, 0.329);
       border-width: thick;
-      font-family: "Times New Roman", Times, serif;
-      border:1px solid rgb(189, 88, 70);
+      font-family: Lato, Times, serif;
+      border-radius: 10px;
       cursor: pointer;
-      padding:5px;
-      margin: 5px auto;
+      padding:10px;
+      margin: 10px auto;
     }
 
+     input[type='checkbox'] { 
+       width: 15px;
+       height: 15px;
+       border-radius: 15px;
+       padding: 10px;
+
+      }
+
     ol li:hover{
-      background: rgb(26, 181, 192)
+      background: rgb(109, 190, 249, .5)
     }
 
     #btnAddProject{
       margin-left: 540px;
       margin-bottom: 20px;
+      font-family: Lato, times, serif;
 
     }
 
@@ -99,7 +122,19 @@
       background-color: rgb(189, 88, 70);
       margin-left: 545px;
       margin-top: 20px;
+      font-family: Lato, times, serif;
     }
+
+    h2 {
+      font-weight: bolder;
+
+    }
+
+    .btnDarkMode {
+
+    margin-bottom: 50px;
+  }
+
 
   </style>
   <script>
@@ -165,11 +200,14 @@
                     $("#projects").tabs("refresh"); // Refresh tabs
                       // Gets the new task from the textbox
                       var taskName = $("new-task-name").val();
+                      
+                      
                       // Get currently active tab
                       var activeTab = $("#projects").tabs("option", "active");
                       var title = $("#main > li:nth-child(" + (activeTab+1) + ") > a")
                       .attr("href");
                       var taskName = $("#new-task-name").val();
+                      taskName = "    " + taskName;
                       $("#projects " + title).append(
                         ("<li><input type ='checkbox'>" + taskName + " </li>")
                       )
@@ -196,10 +234,45 @@
 
       */
       });
+
+
+  //Script for dark mode
+$(document).ready(function(){
+    $("button.btnDarkMode").click(function(){
+
+        $("#Container").toggleClass("white-border");
+        
+
+        $("button.btnDarkMode").toggleClass("btn-dark");
+        $("button.btnDarkMode").toggleClass("btn-white");
+
+        $("body").toggleClass("darkModeBody");
+
+       $("button.btnDarkMode").text($("button.btnDarkMode").text() == 'Dark Mode' ? 'Light Mode' : 'Dark Mode');
+
+
+        
+
+
+
+    });
+});
+
+
+
+
+
+
+
+
+
+
+
+
   </script>
   </head>
   <body>
-    <div id= "Container">
+    <div id= "Container" class="black-border">
       <h2>Task Scheduler</h2>
 
       <div id= "projects">
@@ -209,14 +282,14 @@
           <li><a href ="#eventually">Eventually</a></li>
         </ul>
         <ol id= "personal">
-          <li><input type = "checkbox">Software Engineering Lecture</li>
-          <li><input type = "checkbox">Present Task Scheduler</li>
-          <li><input type = "checkbox">Eat Dinner</li>
+          <li><input type = "checkbox"> Software Engineering Lecture</li>
+          <li><input type = "checkbox"> Present Task Scheduler</li>
+          <li><input type = "checkbox"> Eat Dinner</li>
         </ol>
         <ol id= "work">
-          <li><input type= "checkbox">Study for Exam</li>
-          <li><input type = "checkbox">Finish Homework</li>
-          <li><input type = "checkbox">Learn more jQuery</li>
+          <li><input type= "checkbox"> Study for Exam</li>
+          <li><input type = "checkbox"> Finish Homework</li>
+          <li><input type = "checkbox"> Learn more jQuery</li>
         </ol>
         <ol id= "eventually">
           <li><input type= "checkbox">Change checkbox action to strikethrough and fade</li>
@@ -261,27 +334,6 @@
 
 <!-- Hidden input field for holding current key pressed while in text field -->
 <input id="current_input" hidden value=""/> 
-<script>
 
 
-$(document).ready(function(){
-    $("button.btnDarkMode").click(function(){
-
-        $("div.lineHere").toggleClass("w3-border-black");
-        $("div.lineHere").toggleClass("w3-border-white");
-
-        $("button.btnDarkMode").toggleClass("btn-dark");
-        $("button.btnDarkMode").toggleClass("btn-white");
-
-        $("body").toggleClass("darkModeBody");
-
-       $("button.btnDarkMode").text($("button.btnDarkMode").text() == 'Dark Mode' ? 'Light Mode' : 'Dark Mode');
-
-
-        
-
-
-
-    });
-});
 % include("footer.tpl")
