@@ -24,4 +24,4 @@
 <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
 
 </head>
-<body class="darkModeBody>
+<body class="darkModeBody">
