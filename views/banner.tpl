@@ -1,4 +1,4 @@
-<!--<div class="w3-container w3-topbar w3-leftbar w3-rightbar w3-border-white w3-black">-->
+<!--<div class="w3-container w3-topbar w3-leftbar w3-rightbar w3-border-white w3-black">
   <!-- <span class="w3-xxxlarge w3-margin"><b>Taskbook </b></span> -->
 
   <span class="w3-right" hidden>
@@ -8,7 +8,7 @@
   </span>
 
 
-<!-- Banner Video --> 
+<!-- Banner Video -->
 <style>
   header {
     position: relative;
@@ -33,7 +33,7 @@
     -webkit-transform: translateX(-50%) translateY(-50%);
     transform: translateX(-50%) translateY(-50%);
   }
-  
+
   header .container {
     position: relative;
     z-index: 1;
@@ -51,17 +51,17 @@
     z-index: 1;
   }
   </style>
-  
+
 
   <header>
     <!-- This div is intentionally blank. It creates the transparent black overlay over the video.-->
     <div class="overlay"></div>
-  
+
     <!-- The HTML5 video element that will create the background video on the header -->
     <video playsinline="playsinline" autoplay="autoplay" muted="muted" loop="loop">
       <source src="https://storage.googleapis.com/coverr-main/mp4/Mt_Baker.mp4" type="video/mp4">
     </video>
-  
+
     <style>
       div.w3-display-bottommiddle {
         position: relative;
