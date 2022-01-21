@@ -6,7 +6,7 @@ The application is currently running on the cloud through PythonAnywhere and can
 http://jdannem6.pythonanywhere.com/
 
 ## Example Display
-![](ExampleDisplay.png)
+![](ExampleDisplay.PNG)
 
 
 
